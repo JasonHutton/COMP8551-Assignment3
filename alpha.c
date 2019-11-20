@@ -45,6 +45,8 @@ void AlphaBlt(unsigned char *dst, unsigned char *src, int w, int h)
 	}
 }
 
+// Intel will have the actual manual for these instructions, but Oracle seems to have a decent quick reference:
+// https://docs.oracle.com/cd/E26502_01/html/E28388/eojde.html
 /******************************************************************************/
 void AlphaBltSSE(unsigned char *dst, unsigned char *src, int w, int h)
 {
@@ -101,6 +103,8 @@ pix_loop:
 	}
 }
 
+// Intel will have the actual manual for these instructions, but Oracle seems to have a decent quick reference:
+// https://docs.oracle.com/cd/E18752_01/html/817-5477/eojdc.html
 /******************************************************************************/
 void AlphaBltMMX(unsigned char *dst, unsigned char *src, int w, int h)
 {
