@@ -63,7 +63,7 @@ void AlphaBltSSE(unsigned char *dst, unsigned char *src, int w, int h)
 		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, this initializes to 0.
 		xor			eax,eax				// Performs a logical XOR operation on eax and eax registers, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 scan_loop:								// Label this line to be jumped to.
-		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register.
+		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register. ECX is our count register, it will decrement while looping.
 		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 pix_loop:								// Label this line to be jumped to.
 		movq		mm4,[esi+ebx*8]		// mm0 = src (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of esi+ebx*8 to mm4. ESI is src's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
@@ -92,14 +92,14 @@ pix_loop:								// Label this line to be jumped to.
 		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256
 		packuswb	mm0,mm4				// mm0 = RG BA RG BA
 		movq		[edi+ebx*8],mm0		// dst = mm0
-		inc			ebx
-		loop		pix_loop
+		inc			ebx					// increment the value stored at the address of ebx
+		loop		pix_loop			// loop back to pix_loop label. https://docs.oracle.com/cd/E19455-01/806-3773/instructionset-72/index.html Loop also decrements ECX, and continues without looping if that register is zero.
 //
-		mov			ebx, wmul4
-		add			esi, ebx
-		add			edi, ebx
-		dec			edx
-		jnz			scan_loop
+		mov			ebx, wmul4			// Move the address of wmul4 into ebx
+		add			esi, ebx			// Add the contents of EBX into ESI
+		add			edi, ebx			// Add the contents of EBX into EDI
+		dec			edx					// Decrement EDX
+		jnz			scan_loop			// Jump to label if zero flag is not set. Not entirely sure how and where the zero flag is being set or cleared here.
 	}
 }
 
