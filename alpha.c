@@ -83,7 +83,7 @@ pix_loop:								// Label this line to be jumped to.
 // SECOND PIXEL
 		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A)
 		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A)
-		movq		mm3,mm5				// mm3 = mm5
+		movq		mm3,mm5				// mm3 = mm5		  // Moves the address of a quadword(8 bytes) from address of mm5 to mm3
 		pshufw		mm2,mm4,0ffh		// mm2 = 0A 0A 0A 0A
 		psllw		mm3,8				// mm3 = mm5 * 256
 		psubw		mm4,mm5				// mm4 = mm4 - mm5
@@ -108,15 +108,15 @@ pix_loop:								// Label this line to be jumped to.
 /******************************************************************************/
 void AlphaBltMMX(unsigned char *dst, unsigned char *src, int w, int h)
 {
-	int	wmul4 = w << 2;
+	int	wmul4 = w << 2;					// Shift bits of w 2 to the left, and assign that to wmul4. This multiplies w by 4 and assigns to wmul4.
 
-	if (w==0) return;
-	w >>= 1;
+	if (w==0) return;					// Return if image width is 0, meaning no image is loaded.
+	w >>= 1;							// Shift bits of w 1 to the right. This results in a division of w by 2, assigned back to itself.
 	_asm {
 // For each pixel: dst = (src_alpha * (src-dst)  + dst * 256) / 256
-		mov			edi,dst
-		mov			esi,src
-		mov			edx,h
+		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*) into EDI destination index register, for string operations
+		mov			esi,src				// Move the address of index 0 of src (unsigned char*) into ESI source index register, for string operations
+		mov			edx,h				// Move the address of h (int, 35 bits(4 bytes)) into 32-bit(4 byte) EDX register.
 		pxor		mm6,mm6
 		pxor		mm7,mm7
 		xor			eax,eax
