@@ -69,17 +69,17 @@ pix_loop:								// Label this line to be jumped to.
 		movq		mm4,[esi+ebx*8]		// mm0 = src (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of esi+ebx*8 to mm4. ESI is src's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 		movq		mm5,[edi+ebx*8]		// mm1 = dst (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of edi+ebx*8 to mm5. ESD is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 // FIRST PIXEL
-		movq		mm0,mm4				// mm0 = 00 00 RG BA
-		movq		mm1,mm5				// mm1 = 00 00 RG BA
-		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A)
-		punpcklbw	mm1,mm7				// mm0 = (0R 0G 0B 0A)
-		pshufw		mm2,mm0,0ffh		// mm2 = 0A 0A 0A 0A
-		movq		mm3,mm1				// mm3 = mm1
-		psubw		mm0,mm1				// mm0 = mm0 - mm1
-		psllw		mm3,8				// mm3 = mm1 * 256
-		pmullw		mm0,mm2				// mm0 = (src-dst)*alpha
-		paddw		mm0,mm3				// mm0 = (src-dst)*alpha+dst*256
-		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256
+		movq		mm0,mm4				// mm0 = 00 00 RG BA // Moves the addresses of a quadword(8 bytes: RGBA(Haven't checked the order. TGA is often BGRA though.), each channel is 2 bytes, 0-255.) from mm4 to mm0
+		movq		mm1,mm5				// mm1 = 00 00 RG BA // Moves the addresses of a quadword(8 bytes: RGBA(Haven't checked the order. TGA is often BGRA though.), each channel is 2 bytes, 0-255.) from mm5 to mm1
+		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A) // http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm Explain this more specifically.
+		punpcklbw	mm1,mm7				// mm0 = (0R 0G 0B 0A) // http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm Explain this more specifically.
+		pshufw		mm2,mm0,0ffh		// mm2 = 0A 0A 0A 0A   // http://tommesani.com/index.php/component/content/article/2-simd/36-sse-primer.html Explain this more specifically.
+		movq		mm3,mm1				// mm3 = mm1		  // Moves the address of a quadword(8 bytes) from address of mm1 to mm3
+		psubw		mm0,mm1				// mm0 = mm0 - mm1	  // https://www.felixcloutier.com/x86/psubb:psubw:psubd Explain this more specifically.
+		psllw		mm3,8				// mm3 = mm1 * 256	  // https://www.felixcloutier.com/x86/psllw:pslld:psllq Explain this more specifically.
+		pmullw		mm0,mm2				// mm0 = (src-dst)*alpha // https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html Explain this more specifically.
+		paddw		mm0,mm3				// mm0 = (src-dst)*alpha+dst*256 // https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq Explain this more specifically.
+		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256 // https://www.felixcloutier.com/x86/psrlw:psrld:psrlq Explain this more specifically.
 // SECOND PIXEL
 		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A)
 		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A)
