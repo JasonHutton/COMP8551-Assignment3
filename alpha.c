@@ -50,22 +50,22 @@ void AlphaBlt(unsigned char *dst, unsigned char *src, int w, int h)
 /******************************************************************************/
 void AlphaBltSSE(unsigned char *dst, unsigned char *src, int w, int h)
 {
-	int	wmul4 = w << 2;
+	int	wmul4 = w << 2;					// Shift bits of w 2 to the left, and assign that to wmul4. This multiplies w by 4 and assigns to wmul4.
 
-	if (w==0) return;
-	w >>= 1;
+	if (w==0) return;                   // Return if image width is 0, meaning no image is loaded.
+	w >>= 1;							// Shift bits of w 1 to the right. This results in a division of w by 2, assigned back to itself.
 	_asm {
 // For each pixel: dst = (src_alpha * (src-dst)  + dst * 256) / 256
-		mov			edi,dst
-		mov			esi,src
-		mov			edx,h
-		pxor		mm6,mm6
-		pxor		mm7,mm7
-		xor			eax,eax
-scan_loop:
-		mov			ecx,w
-		xor			ebx,ebx
-pix_loop:
+		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*) into EDI destination index register, for string operations
+		mov			esi,src				// Move the address of index 0 of src (unsigned char*) into ESI source index register, for string operations
+		mov			edx,h				// Move the address of h (int, 35 bits(4 bytes)) into 32-bit(4 byte) EDX register.
+		pxor		mm6,mm6				// Performs a logical XOR operation on mm6 and mm6, then stores the result in mm6, a 64 bit MMX register. Because XORing itself, invert the bits.
+		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, invert the bits.
+		xor			eax,eax				// Performs a logical XOR operation on eax and eax registers, then stores the result in eax, a 32 bit x86 register. Because XORing itself, invert the bits.
+scan_loop:								// Label this line to be jumped to.
+		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register.
+		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, invert the bits.
+pix_loop:								// Label this line to be jumped to.
 		movq		mm4,[esi+ebx*8]		// mm0 = src (RG BA RG BA)
 		movq		mm5,[edi+ebx*8]		// mm1 = dst (RG BA RG BA)
 // FIRST PIXEL
