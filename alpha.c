@@ -64,7 +64,7 @@ void AlphaBltSSE(unsigned char *dst, unsigned char *src, int w, int h)
 		xor			eax,eax				// Performs a logical XOR operation on eax and eax, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 scan_loop:								// Label this line to be jumped to.
 		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register. ECX is our count register, it will decrement while looping.
-		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
+		xor			ebx,ebx				// Performs a logical XOR operation on EBX and EBX, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 pix_loop:								// Label this line to be jumped to.
 		movq		mm4,[esi+ebx*8]		// mm0 = src (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of esi+ebx*8 to mm4. ESI is src's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 		movq		mm5,[edi+ebx*8]		// mm1 = dst (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of edi+ebx*8 to mm5. ESD is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
@@ -122,7 +122,7 @@ void AlphaBltMMX(unsigned char *dst, unsigned char *src, int w, int h)
 		xor			eax,eax				// Performs a logical XOR operation on eax and eax, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 scan_loop:
 		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register. ECX is our count register, it will decrement while looping.
-		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
+		xor			ebx,ebx				// Performs a logical XOR operation on EBX and EBX, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 pix_loop:
 		movq		mm4,[esi+ebx*8]		// mm4 = src (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of esi+ebx*8 to mm4. ESI is src's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 		movq		mm5,[edi+ebx*8]		// mm5 = dst (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of edi+ebx*8 to mm5. ESD is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
