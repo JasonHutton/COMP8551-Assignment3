@@ -70,7 +70,7 @@ pix_loop:								// Label this line to be jumped to.
 		movq		mm5,[edi+ebx*8]		// mm1 = dst (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of edi+ebx*8 to mm5. ESD is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 // FIRST PIXEL
 		movq		mm0,mm4				// mm0 = 00 00 RG BA // Moves the quadword(8 bytes) contents of mm4 into mm0. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
-		movq		mm1,mm5				// mm1 = 00 00 RG BA // Moves the quadword(8 bytes) contents of mm4 into mm0. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
+		movq		mm1,mm5				// mm1 = 00 00 RG BA // Moves the quadword(8 bytes) contents of mm5 into mm1. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
 		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A) // http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm Explain this more specifically.
 		punpcklbw	mm1,mm7				// mm0 = (0R 0G 0B 0A) // http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm Explain this more specifically.
 		pshufw		mm2,mm0,0ffh		// mm2 = 0A 0A 0A 0A   // http://tommesani.com/index.php/component/content/article/2-simd/36-sse-primer.html Explain this more specifically.
@@ -128,7 +128,7 @@ pix_loop:
 		movq		mm5,[edi+ebx*8]		// mm5 = dst (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of edi+ebx*8 to mm5. ESD is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 // FIRST PIXEL
 		movq		mm0,mm4				// mm0 = src (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm4 into mm0. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
-		movq		mm1,mm5				// mm1 = dst (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm4 into mm0. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
+		movq		mm1,mm5				// mm1 = dst (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm5 into mm1. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
 		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A)
 		mov			al,[esi+ebx*8+3]	// eax = pixel alpha (0 - 255)
 		punpcklbw	mm1,mm7				// mm1 = (0R 0G 0B 0A)
