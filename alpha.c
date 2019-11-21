@@ -117,18 +117,18 @@ void AlphaBltMMX(unsigned char *dst, unsigned char *src, int w, int h)
 		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*) into EDI destination index register, for string operations
 		mov			esi,src				// Move the address of index 0 of src (unsigned char*) into ESI source index register, for string operations
 		mov			edx,h				// Move the address of h (int, 35 bits(4 bytes)) into 32-bit(4 byte) EDX register.
-		pxor		mm6,mm6
-		pxor		mm7,mm7
-		xor			eax,eax
+		pxor		mm6,mm6				// Performs a logical XOR operation on mm6 and mm6, then stores the result in mm6, a 64 bit MMX register. Because XORing itself, this initializes to 0.
+		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, this initializes to 0.
+		xor			eax,eax				// Performs a logical XOR operation on eax and eax registers, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 scan_loop:
-		mov			ecx,w
-		xor			ebx,ebx
+		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register. ECX is our count register, it will decrement while looping.
+		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 pix_loop:
-		movq		mm4,[esi+ebx*8]		// mm4 = src (RG BA RG BA)
-		movq		mm5,[edi+ebx*8]		// mm5 = dst (RG BA RG BA)
+		movq		mm4,[esi+ebx*8]		// mm4 = src (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of esi+ebx*8 to mm4. ESI is src's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
+		movq		mm5,[edi+ebx*8]		// mm5 = dst (RG BA RG BA) // Moves a quadword(8 bytes) of data from address of edi+ebx*8 to mm5. ESD is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 // FIRST PIXEL
-		movq		mm0,mm4				// mm0 = src (-- -- RG BA)
-		movq		mm1,mm5				// mm1 = dst (-- -- RG BA)
+		movq		mm0,mm4				// mm0 = src (-- -- RG BA) // Moves the addresses of a quadword(8 bytes: RGBA(Haven't checked the order. TGA is often BGRA though.), each channel is 2 bytes, 0-255.) from mm4 to mm0
+		movq		mm1,mm5				// mm1 = dst (-- -- RG BA) // Moves the addresses of a quadword(8 bytes: RGBA(Haven't checked the order. TGA is often BGRA though.), each channel is 2 bytes, 0-255.) from mm5 to mm1
 		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A)
 		mov			al,[esi+ebx*8+3]	// eax = pixel alpha (0 - 255)
 		punpcklbw	mm1,mm7				// mm1 = (0R 0G 0B 0A)
@@ -157,8 +157,8 @@ pix_loop:
 		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256
 		packuswb	mm4,mm6				// mm4 = RGBA
 		punpckldq	mm0,mm4				// mm0 = RG BA RG BA
-		movq		[edi+ebx*8],mm0		// dst = mm0
-		inc			ebx
+		movq		[edi+ebx*8],mm0		// dst = mm0 // Moves a quadword(8 bytes) of data from address of mm0 to address indicated by edi+ebx*8. EDI is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
+		inc			ebx					// increment the value stored at the address of ebx	// Increment EBX
 // REPEAT
 		loop		pix_loop			// loop back to pix_loop label. https://docs.oracle.com/cd/E19455-01/806-3773/instructionset-72/index.html Loop also decrements ECX, and continues without looping if that register is zero.
 		mov			ebx, wmul4			// Move the address of wmul4 into ebx
