@@ -61,7 +61,7 @@ void AlphaBltSSE(unsigned char *dst, unsigned char *src, int w, int h)
 		mov			edx,h				// Move the address of h (int, 32 bits(4 bytes)) into 32-bit(4 byte) EDX register.
 		pxor		mm6,mm6				// Performs a logical XOR operation on mm6 and mm6, then stores the result in mm6, a 64 bit MMX register. Because XORing itself, this initializes to 0.
 		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, this initializes to 0.
-		xor			eax,eax				// Performs a logical XOR operation on eax and eax registers, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
+		xor			eax,eax				// Performs a logical XOR operation on eax and eax, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 scan_loop:								// Label this line to be jumped to.
 		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register. ECX is our count register, it will decrement while looping.
 		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
@@ -119,7 +119,7 @@ void AlphaBltMMX(unsigned char *dst, unsigned char *src, int w, int h)
 		mov			edx,h				// Move the address of h (int, 32 bits(4 bytes)) into 32-bit(4 byte) EDX register.
 		pxor		mm6,mm6				// Performs a logical XOR operation on mm6 and mm6, then stores the result in mm6, a 64 bit MMX register. Because XORing itself, this initializes to 0.
 		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, this initializes to 0.
-		xor			eax,eax				// Performs a logical XOR operation on eax and eax registers, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
+		xor			eax,eax				// Performs a logical XOR operation on eax and eax, then stores the result in eax, a 32 bit x86 register. Because XORing itself, this initializes to 0.
 scan_loop:
 		mov			ecx,w				// Move address of w into ECX 32 bit(4 byte) register. ECX is our count register, it will decrement while looping.
 		xor			ebx,ebx				// Perform a logical XOR operation on EBX and EBX registers, then stores the result in EBX, a 32 bit x86 register. Because XORing itself, this initializes to 0.
