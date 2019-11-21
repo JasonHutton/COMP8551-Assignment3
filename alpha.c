@@ -81,18 +81,18 @@ pix_loop:								// Label this line to be jumped to.
 		paddw		mm0,mm3				// mm0 = (src-dst)*alpha+dst*256 // https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq Explain this more specifically.
 		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256 // https://www.felixcloutier.com/x86/psrlw:psrld:psrlq Explain this more specifically.
 // SECOND PIXEL
-		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A)
-		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A)
+		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A) // https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq Explain this more specifically.
+		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A) // https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq Explain this more specifically.
 		movq		mm3,mm5				// mm3 = mm5		  // Moves the address of a quadword(8 bytes) from address of mm5 to mm3
-		pshufw		mm2,mm4,0ffh		// mm2 = 0A 0A 0A 0A
-		psllw		mm3,8				// mm3 = mm5 * 256
-		psubw		mm4,mm5				// mm4 = mm4 - mm5
-		pmullw		mm4,mm2				// mm4 = (src-dst)*alpha
-		paddw		mm4,mm3				// mm4 = (src-dst)*alpha+dst*256
-		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256
-		packuswb	mm0,mm4				// mm0 = RG BA RG BA
-		movq		[edi+ebx*8],mm0		// dst = mm0
-		inc			ebx					// increment the value stored at the address of ebx
+		pshufw		mm2,mm4,0ffh		// mm2 = 0A 0A 0A 0A  // https://www.felixcloutier.com/x86/pshufw Explain this more specifically.
+		psllw		mm3,8				// mm3 = mm5 * 256		// https://www.felixcloutier.com/x86/psllw:pslld:psllq Explain this more specifically.
+		psubw		mm4,mm5				// mm4 = mm4 - mm5		// https://www.felixcloutier.com/x86/psubb:psubw:psubd Explain this more specifically.
+		pmullw		mm4,mm2				// mm4 = (src-dst)*alpha // https://www.felixcloutier.com/x86/pmullw Explain this more specifically.
+		paddw		mm4,mm3				// mm4 = (src-dst)*alpha+dst*256 // https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq Explain this more specifically.
+		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256 // https://www.felixcloutier.com/x86/psrlw:psrld:psrlq Explain this more specifically.
+		packuswb	mm0,mm4				// mm0 = RG BA RG BA // https://www.felixcloutier.com/x86/packuswb Explain this more specifically.
+		movq		[edi+ebx*8],mm0		// dst = mm0		// Moves a quadword(8 bytes) of data from address of mm0 to address indicated by edi+ebx*8. EDI is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
+		inc			ebx					// increment the value stored at the address of ebx	// Increment EBX
 		loop		pix_loop			// loop back to pix_loop label. https://docs.oracle.com/cd/E19455-01/806-3773/instructionset-72/index.html Loop also decrements ECX, and continues without looping if that register is zero.
 //
 		mov			ebx, wmul4			// Move the address of wmul4 into ebx
@@ -160,12 +160,12 @@ pix_loop:
 		movq		[edi+ebx*8],mm0		// dst = mm0
 		inc			ebx
 // REPEAT
-		loop		pix_loop
-		mov			ebx, wmul4
-		add			esi, ebx
-		add			edi, ebx
-		dec			edx
-		jnz			scan_loop
+		loop		pix_loop			// loop back to pix_loop label. https://docs.oracle.com/cd/E19455-01/806-3773/instructionset-72/index.html Loop also decrements ECX, and continues without looping if that register is zero.
+		mov			ebx, wmul4			// Move the address of wmul4 into ebx
+		add			esi, ebx			// Add the contents of EBX into ESI
+		add			edi, ebx			// Add the contents of EBX into EDI
+		dec			edx					// Decrement EDX
+		jnz			scan_loop			// Jump to label if zero flag is not set. Not entirely sure how and where the zero flag is being set or cleared here.
 	}
 }
 
