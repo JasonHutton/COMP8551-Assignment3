@@ -56,8 +56,8 @@ void AlphaBltSSE(unsigned char *dst, unsigned char *src, int w, int h)
 	w >>= 1;							// Shift bits of w 1 to the right. This results in a division of w by 2, assigned back to itself.
 	_asm {
 // For each pixel: dst = (src_alpha * (src-dst)  + dst * 256) / 256
-		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*(8 bits, 1 byte)) into EDI destination index register, for string operations
-		mov			esi,src				// Move the address of index 0 of src (unsigned char*(8 bits, 1 byte)) into ESI source index register, for string operations
+		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*(Because this is a pointer, it's an int, being compiled as x86, so 32 bits, or 2 bytes)) into EDI destination index register, for string operations
+		mov			esi,src				// Move the address of index 0 of src (unsigned char*(Because this is a pointer, it's an int, being compiled as x86, so 32 bits, or 2 bytes)) into ESI source index register, for string operations
 		mov			edx,h				// Move the address of h (int, 32 bits(4 bytes)) into 32-bit(4 byte) EDX register.
 		pxor		mm6,mm6				// Performs a logical XOR operation on mm6 and mm6, then stores the result in mm6, a 64 bit MMX register. Because XORing itself, this initializes to 0.
 		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, this initializes to 0.
@@ -114,8 +114,8 @@ void AlphaBltMMX(unsigned char *dst, unsigned char *src, int w, int h)
 	w >>= 1;							// Shift bits of w 1 to the right. This results in a division of w by 2, assigned back to itself.
 	_asm {
 // For each pixel: dst = (src_alpha * (src-dst)  + dst * 256) / 256
-		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*(8 bits, 1 byte)) into EDI destination index register, for string operations
-		mov			esi,src				// Move the address of index 0 of src (unsigned char*(8 bits, 1 byte)) into ESI source index register, for string operations
+		mov			edi,dst				// Move the address of index 0 of dst (unsigned char*(Because this is a pointer, it's an int, being compiled as x86, so 32 bits, or 2 bytes)) into EDI destination index register, for string operations
+		mov			esi,src				// Move the address of index 0 of src (unsigned char*(Because this is a pointer, it's an int, being compiled as x86, so 32 bits, or 2 bytes)) into ESI source index register, for string operations
 		mov			edx,h				// Move the address of h (int, 32 bits(4 bytes)) into 32-bit(4 byte) EDX register.
 		pxor		mm6,mm6				// Performs a logical XOR operation on mm6 and mm6, then stores the result in mm6, a 64 bit MMX register. Because XORing itself, this initializes to 0.
 		pxor		mm7,mm7				// Performs a logical XOR operation on mm7 and mm7, then stores the result in mm7, a 64 bit MMX register. Because XORing itself, this initializes to 0.
