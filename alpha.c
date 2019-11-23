@@ -76,21 +76,21 @@ pix_loop:								// Label this line to be jumped to.
 		pshufw		mm2,mm0,0ffh		// mm2 = 0A 0A 0A 0A   // Shuffles the words(2 bytes) from mm0 into mm2 using the third operand to define their placement in mm2. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc254.htm
 		movq		mm3,mm1				// mm3 = mm1		  // Moves the quadword(8 bytes) contents of mm1 to mm3.
 		psubw		mm0,mm1				// mm0 = mm0 - mm1	  // Subtract packed word integers in mm1 from packed word integers in mm0. https://www.felixcloutier.com/x86/psubb:psubw:psubd
-		psllw		mm3,8				// mm3 = mm1 * 256	  // Shift bits in mm3 left 8 places. https://www.felixcloutier.com/x86/psllw:pslld:psllq
-		pmullw		mm0,mm2				// mm0 = (src-dst)*alpha // Multiply packed signed word integers and store low result in mm0 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
+		psllw		mm3,8				// mm3 = mm1 * 256	  // Shift bits in mm3 left 8 places (Multiply by 256). https://www.felixcloutier.com/x86/psllw:pslld:psllq
+		pmullw		mm0,mm2				// mm0 = (src-dst)*alpha // Multiply mm2 and mm0, and store low order bits of result in mm0 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
 		paddw		mm0,mm3				// mm0 = (src-dst)*alpha+dst*256 // Add packed word integers mm3 and mm0, into mm0. https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq
-		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256 // Shift words in mm0 right by 8. https://www.felixcloutier.com/x86/psrlw:psrld:psrlq
+		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256 // Shift words in mm0 right by 8 (Divide by 256). https://www.felixcloutier.com/x86/psrlw:psrld:psrlq
 // SECOND PIXEL
 		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm5 and mm7 into mm5. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
 		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm4 and mm6 into mm4. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
 		movq		mm3,mm5				// mm3 = mm5		  // Moves the quadword(8 bytes) contents of mm5 to mm3.
 		pshufw		mm2,mm4,0ffh		// mm2 = 0A 0A 0A 0A  // Shuffles the words(2 bytes) from mm4 into mm2 using the third operand to define their placement in mm2. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc254.htm
-		psllw		mm3,8				// mm3 = mm5 * 256		// Shift bits in mm3 left 8 places. https://www.felixcloutier.com/x86/psllw:pslld:psllq
+		psllw		mm3,8				// mm3 = mm5 * 256		// Shift bits in mm3 left 8 places (Multiply by 256). https://www.felixcloutier.com/x86/psllw:pslld:psllq
 		psubw		mm4,mm5				// mm4 = mm4 - mm5		// Subtract packed word integers in mm5 from packed word integers in mm4. https://www.felixcloutier.com/x86/psubb:psubw:psubd
-		pmullw		mm4,mm2				// mm4 = (src-dst)*alpha // Multiply packed signed word integers and store low result in mm4 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
+		pmullw		mm4,mm2				// mm4 = (src-dst)*alpha // Multiply mm2 and mm4, and store low order bits of result in mm4 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
 		paddw		mm4,mm3				// mm4 = (src-dst)*alpha+dst*256 // Add packed word integers mm4 and mm3, into mm4. https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq
-		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256 // Shift words in mm4 right by 8. https://www.felixcloutier.com/x86/psrlw:psrld:psrlq
-		packuswb	mm0,mm4				// mm0 = RG BA RG BA // Converts 4 signed word integers from mm0 and 4 signed word integers from mm4 into 8 unsigned byte integers in mm0 using unsigned saturation.
+		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256 // Shift words in mm4 right by 8 (Divide by 256). https://www.felixcloutier.com/x86/psrlw:psrld:psrlq
+		packuswb	mm0,mm4				// mm0 = RG BA RG BA // Converts 4 signed word integers from mm0 and 4 signed word integers from mm4 into 8 unsigned byte integers in mm0 using unsigned saturation. (Set to min of range if below, set to max of range if above)
 		movq		[edi+ebx*8],mm0		// dst = mm0		// Moves the quadword(8 bytes) contents of mm0 to address indicated by edi+ebx*8. EDI is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 		inc			ebx					// increment the value stored at the address of ebx	// Increment EBX
 		loop		pix_loop			// loop back to pix_loop label. https://docs.oracle.com/cd/E19455-01/806-3773/instructionset-72/index.html Loop also decrements ECX, and continues without looping if that register is zero.
@@ -129,34 +129,34 @@ pix_loop:
 // FIRST PIXEL
 		movq		mm0,mm4				// mm0 = src (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm4 into mm0. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
 		movq		mm1,mm5				// mm1 = dst (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm5 into mm1. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
-		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A)
-		mov			al,[esi+ebx*8+3]	// eax = pixel alpha (0 - 255)
-		punpcklbw	mm1,mm7				// mm1 = (0R 0G 0B 0A)
-		movd		mm2,eax				// 00 00 00 0A
-		movq		mm3,mm1				// mm3 = mm1: dst (0R 0G 0B 0A)
-		punpcklwd	mm2,mm2				// 00 00 0A 0A
-		psubw		mm0,mm1				// mm0 = mm0 - mm1
-		punpckldq	mm2,mm2				// 0A 0A 0A 0A
-		psllw		mm3,8				// mm3 = mm1 * 256
-		pmullw		mm0,mm2				// mm0 = (src - dst) * alpha
-		paddw		mm0,mm3				// mm0 = (src - dst) * alpha + dst * 256
-		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256
-		packuswb	mm0,mm6				// mm0 = RGBA
+		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A) // Interleaves low order bytes of mm0 and mm6 together, into mm0. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
+		mov			al,[esi+ebx*8+3]	// eax = pixel alpha (0 - 255) // Move memory contents of esi+ebx*8+3 into al.
+		punpcklbw	mm1,mm7				// mm1 = (0R 0G 0B 0A) // Interleaves low order bytes of mm1 and mm7 together, into mm1. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
+		movd		mm2,eax				// 00 00 00 0A  // Moves a doubleword(4 bytes) of data from eax to mm2
+		movq		mm3,mm1				// mm3 = mm1: dst (0R 0G 0B 0A) // Moves a quadword(8 bytes) of data from mm1 to mm3
+		punpcklwd	mm2,mm2				// 00 00 0A 0A // Interleave words from low doublewords of mm2 into itself? http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
+		psubw		mm0,mm1				// mm0 = mm0 - mm1 // Subtract packed word integers in mm1 from packed word integers in mm0. https://www.felixcloutier.com/x86/psubb:psubw:psubd
+		punpckldq	mm2,mm2				// 0A 0A 0A 0A // Interleave low doublewords of mm2 into itself? http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
+		psllw		mm3,8				// mm3 = mm1 * 256 // Shift bits in mm3 left 8 places (Multiply by 256). https://www.felixcloutier.com/x86/psllw:pslld:psllq
+		pmullw		mm0,mm2				// mm0 = (src - dst) * alpha // Multiply mm2 and mm0, and store low order bits of result in mm0 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
+		paddw		mm0,mm3				// mm0 = (src - dst) * alpha + dst * 256 // Add packed word integers mm3 and mm0, into mm0. https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq
+		psrlw		mm0,8				// mm0 = ((src - dst) * alpha + dst * 256) / 256 // Shift words in mm0 right by 8 (Divide by 256). https://www.felixcloutier.com/x86/psrlw:psrld:psrlq
+		packuswb	mm0,mm6				// mm0 = RGBA // Converts 4 signed word integers from mm0 and 4 signed word integers from mm6 into 8 unsigned byte integers in mm0 using unsigned saturation. (Set to min of range if below, set to max of range if above)
 // SECOND PIXEL
-		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A)
-		mov			al,[esi+ebx*8+7]	// eax = pixel alpha (0 - 255)
-		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A)
-		movd		mm2,eax				// 00 00 00 0A
-		movq		mm3,mm5				// mm3 = mm5: dst (0R 0G 0B 0A)
-		punpcklwd	mm2,mm2				// 00 00 0A 0A
-		psubw		mm4,mm5				// mm4 = mm4 - mm5
-		punpckldq	mm2,mm2				// 0A 0A 0A 0A
-		psllw		mm3,8				// mm3 = mm5 * 256
-		pmullw		mm4,mm2				// mm4 = (src - dst) * alpha
-		paddw		mm4,mm3				// mm4 = (src - dst) * alpha + dst * 256
-		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256
-		packuswb	mm4,mm6				// mm4 = RGBA
-		punpckldq	mm0,mm4				// mm0 = RG BA RG BA
+		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm6 and mm4 into mm4. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
+		mov			al,[esi+ebx*8+7]	// eax = pixel alpha (0 - 255) // Move memory contents of esi+ebx*8+3 into al.
+		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm7 and mm5 into mm5. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
+		movd		mm2,eax				// 00 00 00 0A // Moves a doubleword(4 bytes) of data from eax to mm2
+		movq		mm3,mm5				// mm3 = mm5: dst (0R 0G 0B 0A) // Moves a quadword(8 bytes) of data from mm5 to mm3
+		punpcklwd	mm2,mm2				// 00 00 0A 0A // Interleave words from low doublewords of mm2 into itself? http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
+		psubw		mm4,mm5				// mm4 = mm4 - mm5 // Subtract packed word integers in mm5 from packed word integers in mm4. https://www.felixcloutier.com/x86/psubb:psubw:psubd
+		punpckldq	mm2,mm2				// 0A 0A 0A 0A // Interleave low doublewords of mm2 into itself? http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
+		psllw		mm3,8				// mm3 = mm5 * 256 // Shift bits in mm3 left 8 places (Multiply by 256). https://www.felixcloutier.com/x86/psllw:pslld:psllq
+		pmullw		mm4,mm2				// mm4 = (src - dst) * alpha // Multiply mm2 and mm4, and store low order bits of result in mm4 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
+		paddw		mm4,mm3				// mm4 = (src - dst) * alpha + dst * 256 // Add packed word integers mm3 and mm4, into mm4. https://www.felixcloutier.com/x86/paddb:paddw:paddd:paddq
+		psrlw		mm4,8				// mm4 = ((src - dst) * alpha + dst * 256) / 256 // Shift words in mm4 right by 8 (Divide by 256). https://www.felixcloutier.com/x86/psrlw:psrld:psrlq
+		packuswb	mm4,mm6				// mm4 = RGBA // Converts 4 signed word integers from mm6 and 4 signed word integers from mm4 into 8 unsigned byte integers in mm4 using unsigned saturation. (Set to min of range if below, set to max of range if above)
+		punpckldq	mm0,mm4				// mm0 = RG BA RG BA // Interleave low doublewords of mm0 and mm4 into mm0 http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
 		movq		[edi+ebx*8],mm0		// dst = mm0 // Moves a quadword(8 bytes) of data from address of mm0 to address indicated by edi+ebx*8. EDI is dst's starting address+EBX which is an offset counter, of 8 bytes. EBX is a counter.
 		inc			ebx					// increment the value stored at the address of ebx	// Increment EBX
 // REPEAT
