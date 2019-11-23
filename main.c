@@ -123,6 +123,16 @@ void TestBench(int nAlphaFn)
 	MessageBox(HWND_DESKTOP, tmp, "AlphaBlend", MB_OK | MB_ICONINFORMATION);
 }
 
+int AddByValue(int x, int y)
+{
+	return x + y;
+}
+
+int AddByReference(int* x, int* y)
+{
+	return *x + *y;
+}
+
 /******************************************************************************/
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -134,6 +144,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	HDC			hDC;
 	LONG		startTick;
 //
+
+	int x = 1, y = 2;
+	int result = 0;
+	result = AddByValue(x, y);
+	result = 0;
+	result = AddByReference(&x, &y);
+
 	g_hInst = hInstance;
 // Load the test images
 	if (!LoadTga("test1.tga", &g_tga1) || !LoadTga("test2.tga", &g_tga2))
