@@ -133,7 +133,8 @@ int AddByReference(int* x, int* y)
 	return *x + *y;
 }
 
-inline int SimpleMath()
+int SimpleMath()
+//inline int SimpleMath()
 {
 	return 1 + 1;
 }
