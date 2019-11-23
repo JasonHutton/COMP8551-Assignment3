@@ -133,6 +133,11 @@ int AddByReference(int* x, int* y)
 	return *x + *y;
 }
 
+int SimpleMath()
+{
+	return 1 + 1;
+}
+
 /******************************************************************************/
 int APIENTRY WinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -150,6 +155,8 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	result = AddByValue(x, y);
 	result = 0;
 	result = AddByReference(&x, &y);
+	result = 0;
+	result = SimpleMath();
 
 	g_hInst = hInstance;
 // Load the test images
