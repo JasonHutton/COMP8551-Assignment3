@@ -130,7 +130,7 @@ pix_loop:
 		movq		mm0,mm4				// mm0 = src (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm4 into mm0. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
 		movq		mm1,mm5				// mm1 = dst (-- -- RG BA) // Moves the quadword(8 bytes) contents of mm5 into mm1. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
 		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A) // Interleaves low order bytes of mm0 and mm6 together, into mm0. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
-		mov			al,[esi+ebx*8+3]	// eax = pixel alpha (0 - 255) // Move memory contents of esi+ebx*8+3 into al.
+		mov			al,[edi+ebx*8+3]	// eax = pixel alpha (0 - 255) // Move memory contents of esi+ebx*8+3 into al. -- Use edi instead of esi for Question 2.
 		punpcklbw	mm1,mm7				// mm1 = (0R 0G 0B 0A) // Interleaves low order bytes of mm1 and mm7 together, into mm1. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
 		movd		mm2,eax				// 00 00 00 0A  // Moves a doubleword(4 bytes) of data from eax to mm2
 		movq		mm3,mm1				// mm3 = mm1: dst (0R 0G 0B 0A) // Moves a quadword(8 bytes) of data from mm1 to mm3
@@ -144,7 +144,7 @@ pix_loop:
 		packuswb	mm0,mm6				// mm0 = RGBA // Converts 4 signed word integers from mm0 and 4 signed word integers from mm6 into 8 unsigned byte integers in mm0 using unsigned saturation. (Set to min of range if below, set to max of range if above)
 // SECOND PIXEL
 		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm6 and mm4 into mm4. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
-		mov			al,[esi+ebx*8+7]	// eax = pixel alpha (0 - 255) // Move memory contents of esi+ebx*8+3 into al.
+		mov			al,[edi+ebx*8+7]	// eax = pixel alpha (0 - 255) // Move memory contents of esi+ebx*8+3 into al. -- Use edi instead of esi for Question 2.
 		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm7 and mm5 into mm5. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
 		movd		mm2,eax				// 00 00 00 0A // Moves a doubleword(4 bytes) of data from eax to mm2
 		movq		mm3,mm5				// mm3 = mm5: dst (0R 0G 0B 0A) // Moves a quadword(8 bytes) of data from mm5 to mm3
