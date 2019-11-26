@@ -73,7 +73,7 @@ pix_loop:								// Label this line to be jumped to.
 		movq		mm1,mm5				// mm1 = 00 00 RG BA // Moves the quadword(8 bytes) contents of mm5 into mm1. This will be RGBA, with each channel being 2 bytes, with a value of 0-255.
 		punpcklbw	mm0,mm6				// mm0 = (0R 0G 0B 0A) // Interleaves low order bytes of mm0 and mm6 together, into mm0. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
 		punpcklbw	mm1,mm7				// mm0 = (0R 0G 0B 0A) // Interleaves low order bytes of mm1 and mm7 together, into mm1. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc265.htm
-		pshufw		mm2,mm1,0ffh		// mm2 = 0A 0A 0A 0A   // Shuffles the words(2 bytes) from mm0 into mm2 using the third operand to define their placement in mm2. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc254.htm
+		pshufw		mm2,mm1,0ffh		// mm2 = 0A 0A 0A 0A   // Shuffles the words(2 bytes) from mm0 into mm2 using the third operand to define their placement in mm2. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc254.htm -- Uses mm1 instead of mm2 for Question 2.
 		movq		mm3,mm1				// mm3 = mm1		  // Moves the quadword(8 bytes) contents of mm1 to mm3.
 		psubw		mm0,mm1				// mm0 = mm0 - mm1	  // Subtract packed word integers in mm1 from packed word integers in mm0. https://www.felixcloutier.com/x86/psubb:psubw:psubd
 		psllw		mm3,8				// mm3 = mm1 * 256	  // Shift bits in mm3 left 8 places (Multiply by 256). https://www.felixcloutier.com/x86/psllw:pslld:psllq
@@ -84,7 +84,7 @@ pix_loop:								// Label this line to be jumped to.
 		punpckhbw	mm5,mm7				// mm5 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm5 and mm7 into mm5. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
 		punpckhbw	mm4,mm6				// mm4 = (0R 0G 0B 0A) // Unpack and interleave high-order bytes from mm4 and mm6 into mm4. https://www.felixcloutier.com/x86/punpckhbw:punpckhwd:punpckhdq:punpckhqdq
 		movq		mm3,mm5				// mm3 = mm5		  // Moves the quadword(8 bytes) contents of mm5 to mm3.
-		pshufw		mm2,mm5,0ffh		// mm2 = 0A 0A 0A 0A  // Shuffles the words(2 bytes) from mm4 into mm2 using the third operand to define their placement in mm2. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc254.htm
+		pshufw		mm2,mm5,0ffh		// mm2 = 0A 0A 0A 0A  // Shuffles the words(2 bytes) from mm4 into mm2 using the third operand to define their placement in mm2. http://qcd.phys.cmu.edu/QCDcluster/intel/vtune/reference/vc254.htm -- Uses mm5 instead of mm4 for Question 2.
 		psllw		mm3,8				// mm3 = mm5 * 256		// Shift bits in mm3 left 8 places (Multiply by 256). https://www.felixcloutier.com/x86/psllw:pslld:psllq
 		psubw		mm4,mm5				// mm4 = mm4 - mm5		// Subtract packed word integers in mm5 from packed word integers in mm4. https://www.felixcloutier.com/x86/psubb:psubw:psubd
 		pmullw		mm4,mm2				// mm4 = (src-dst)*alpha // Multiply mm2 and mm4, and store low order bits of result in mm4 https://docs.oracle.com/cd/E19120-01/open.solaris/817-5477/eojdc/index.html
